@@ -1,0 +1,31 @@
+EBBE A MAPPÁBA AHOL A HTML FÁLJ TALÁLHATÓ KELL BEILLESZTENI A KÉPEKET,
+MINDEN KÉP LEHETŐLEG 1:1 KÉPARÁNYBAN LEGYEN (EZ ELHANYAGOLHATÓ)
+
+Hogyan kell elnevezni a képeket?
+-Itt egy lista, sorban vannak benne a nevek, a listában szereplő sorszám hoz tartozik az adott név és kép
+(példa: #1 Gipsz Jakab --> 1.png
+példa2: #5 Lakatos     --> 5.png)
+A KÉPEK ELNEVEZÉSE FONTOS HOGY SZÁM LEGYEN ÉS CSAK PNG FORMÁTUMBAN JÓ
+
+Lista:
+
+
+
+
+
+
+
+
+#14 Patrik --> 14.png
+#15 Bancsi --> 15.png
+
+
+#18 Lina --> 18.png
+
+
+
+
+
+
+#28 G.Krisz --> 28.png
+#29 Hunor --> 29.png

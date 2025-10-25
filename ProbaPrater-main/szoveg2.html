@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Szöveg animáció</title>
+  <style>
+    :root{
+      --bg:#000;
+      --text:#e6eef8;
+      --font-sz: clamp(20px, 4vw, 48px);
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:var(--text);
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* Háttér csillagok */
+    .stars{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      z-index:0;
+      background:transparent;
+    }
+    .star{
+      position:absolute;
+      width:2px;
+      height:2px;
+      background:white;
+      border-radius:50%;
+      opacity:0.8;
+      animation: twinkle 3s infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity:0.2; transform:scale(0.8); }
+      50% { opacity:1; transform:scale(1.2); }
+    }
+
+    /* Szöveg animációs képernyő */
+    .display-wrap{
+      pointer-events:none;
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.85);
+      transition:opacity 1s ease;
+      z-index:10;
+    }
+    .display-wrap.hidden{opacity:0;pointer-events:none;}
+    .line{
+      font-size:var(--font-sz);
+      font-weight:600;
+      line-height:1.2;
+      text-align:center;
+      max-width:90%;
+      display:inline-block;
+      letter-spacing:0.3px;
+      white-space:normal;
+      word-wrap:break-word;
+      word-break:normal;
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)) drop-shadow(0 0 8px rgba(120,180,255,0.5));
+    }
+    .word{
+      display:inline-flex;
+      white-space:nowrap;
+      margin-right:0.35em; /* kis szóköz */
+    }
+    .char{
+      opacity:0;
+      display:inline-block;
+      transform:translateY(8px);
+      transition:opacity 240ms ease, transform 260ms cubic-bezier(.2,.9,.3,1);
+    }
+    .char.visible{
+      opacity:1;
+      transform:translateY(0)
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+
+  <div class="display-wrap" id="intro">
+    <div id="display" class="line" aria-live="polite"></div>
+  </div>
+
+  <script>
+    const lines = [
+      "Az osztáyközösségünkre egy kis csiszolódás ráfér még...",
+      "Így Prátert szemeltük ki célul",
+      "Egy feljethetelen bécsi napra mennénk el, tele élményekkel",
+    ];
+
+    const display = document.getElementById('display');
+    const intro = document.getElementById('intro');
+    const stars = document.getElementById('stars');
+    let isPlaying = false;
+    let currentTimerIds = [];
+    let currentIndex = 0;
+
+    // Csillagok generálása
+    function createStars(count = 150) {
+      for(let i=0; i<count; i++){
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.top = Math.random()*100 + '%';
+        s.style.left = Math.random()*100 + '%';
+        s.style.animationDelay = (Math.random()*5)+'s';
+        s.style.opacity = Math.random()*0.8+0.2;
+        stars.appendChild(s);
+      }
+    }
+    createStars();
+
+    function clearTimers(){
+      currentTimerIds.forEach(id=>clearTimeout(id));
+      currentTimerIds=[];
+    }
+
+    function showLine(text, cb){
+      clearTimers();
+      display.innerHTML = '';
+
+      const words = text.split(' ');
+      const perChar = 60;
+      const initialDelay = 200;
+      let totalDelay = initialDelay;
+
+      words.forEach((word, wordIndex) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'word';
+        display.appendChild(wordSpan);
+
+        // minden betű külön karakter span
+        for (let i = 0; i < word.length; i++) {
+          const ch = word[i];
+          const charEl = document.createElement('span');
+          charEl.className = 'char';
+          charEl.textContent = ch;
+          wordSpan.appendChild(charEl);
+
+          const delay = totalDelay;
+          const id = setTimeout(() => {
+            charEl.classList.add('visible');
+          }, delay);
+          currentTimerIds.push(id);
+          totalDelay += perChar;
+        }
+        totalDelay += 100; // kis szünet szóköz után
+      });
+
+      const total = totalDelay + 400;
+      const endId = setTimeout(() => { if(cb) cb(); }, total);
+      currentTimerIds.push(endId);
+    }
+
+    function playSequence(){
+      if(!isPlaying) return;
+      if(currentIndex >= lines.length){
+        isPlaying = false;
+        setTimeout(()=>{
+          intro.classList.add('hidden');
+          setTimeout(()=>{
+            window.location.href = "donut3.html";
+          }, 2000);
+        }, 1000);
+        return;
+      }
+      const text = lines[currentIndex];
+      showLine(text, ()=>{
+        setTimeout(()=>{
+          currentIndex++;
+          playSequence();
+        }, 1000);
+      });
+    }
+
+    function startIntro(){
+      if(isPlaying) return;
+      isPlaying = true;
+      currentIndex = 0;
+      playSequence();
+    }
+
+    startIntro();
+  </script>
+</body>
+</html>
